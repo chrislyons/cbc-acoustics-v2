@@ -25,10 +25,18 @@
   "author": "Chris Lyons",
   "license": "UNLICENSED",
   "dependencies": {
+    "autoprefixer": "^10.4.21",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.553.0",
+    "postcss": "^8.5.6",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.9.5",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^22.10.0",
     "@types/react": "^18.3.12",

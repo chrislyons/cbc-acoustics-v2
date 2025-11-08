@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  font-family: var(--font-sans);
+}
