@@ -1,0 +1,53 @@
+# Archive directories
+docs/*/archive/
+.claude/archive/
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.turbo/
+
+# Large data files (keep in git, exclude from Claude context)
+*.wav
+*.mp3
+*.flac
+
+# Test coverage
+coverage/
+.nyc_output/
+htmlcov/
+.pytest_cache/
+
+# Logs
+*.log
+
+# Draft files
+*.draft.md
+*.draft.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+.claude/scratch/

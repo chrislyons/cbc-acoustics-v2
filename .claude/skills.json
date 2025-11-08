@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "description": "CBC Acoustics Dashboard v2 - Autonomous rebuild configuration",
+  "templates": {
+    "data-validator": {
+      "source": "~/dev/.claude/skill-templates/data-validator",
+      "enabled": true,
+      "filePatterns": ["data/**/*.csv", "data/**/*.json"],
+      "lazyLoad": true,
+      "context": "Validate acoustic measurement data integrity"
+    },
+    "visualization-architect": {
+      "source": "~/dev/.claude/skill-templates/visualization-architect",
+      "enabled": true,
+      "filePatterns": ["src/visualizations/**/*", "src/components/**/*"],
+      "lazyLoad": false,
+      "context": "Modern web visualization patterns (D3, Three.js, Canvas)"
+    },
+    "test-analyzer": {
+      "source": "~/dev/.claude/skill-templates/test-analyzer",
+      "enabled": true,
+      "filePatterns": ["tests/**/*", "**/*.test.*"],
+      "lazyLoad": true
+    },
+    "doc-standards": {
+      "source": "~/dev/.claude/skill-templates/doc-standards",
+      "enabled": true,
+      "filePatterns": ["docs/acu/**/*.md"],
+      "lazyLoad": true
+    }
+  },
+  "skills": {
+    "acoustics-domain": {
+      "description": "CBC Studio 8 acoustics domain knowledge",
+      "triggers": ["RT60", "STI", "frequency response", "modal analysis", "room modes"],
+      "references": [
+        "docs/acu/ACU001 Project Vision.md",
+        ".claude/context/original-implementation.md"
+      ]
+    },
+    "autonomous-sprints": {
+      "description": "Self-directed sprint execution framework",
+      "triggers": ["sprint", "autonomous", "workflow"],
+      "references": [
+        "docs/acu/ACU002 Sprint 1 Setup.md",
+        "docs/acu/ACU003 Sprint 2 Architecture.md",
+        "docs/acu/ACU004 Sprint 3 Core Components.md",
+        "docs/acu/ACU005 Sprint 4 Polish.md"
+      ]
+    }
+  }
+}
