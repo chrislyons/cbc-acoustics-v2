@@ -11,8 +11,9 @@ import {
   ReferenceLine,
 } from 'recharts'
 import { useAcoustics } from '../../context/AcousticsContext'
-import { generateFrequencyResponse, getRoomModes } from '../../lib/data/frequencyResponse'
-import { MEASUREMENT_POSITIONS, getSTIColor } from '../../lib/utils/positions'
+import { identifyRoomModes } from '../../lib/acoustics/modes' // Using the more comprehensive modal analysis
+import { STUDIO_8 } from '../../lib/utils/constants' // To get room dimensions for modal analysis
+import { getSTIColor } from '../../lib/utils/positions' // This import might need review if MEASUREMENT_POSITIONS is removed
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
@@ -20,29 +21,51 @@ import { Download, FileDown } from 'lucide-react'
 import { exportToCSV, exportChartAsPNG, generateFilename } from '../../lib/utils/export'
 
 export function FrequencyExplorer() {
-  const { selectedPosition, setSelectedPosition } = useAcoustics()
+  const { selectedPosition, setSelectedPosition, rawFrequencyData, smaartData } = useAcoustics()
   const [showModalAnalysis, setShowModalAnalysis] = useState(true)
   const [freqRange, setFreqRange] = useState<[number, number]>([20, 20000])
   const chartRef = useRef<HTMLDivElement>(null)
 
-  // Generate frequency response data
-  const frequencyData = useMemo(() => generateFrequencyResponse(), [])
-  const roomModes = useMemo(() => getRoomModes(), [])
+  // Transform rawFrequencyData for recharts
+  const transformedFrequencyData = useMemo(() => {
+    const dataMap = new Map<number, Record<string, any>>();
+
+    rawFrequencyData.forEach(item => {
+      if (!dataMap.has(item.frequency)) {
+        dataMap.set(item.frequency, { frequency: item.frequency });
+      }
+      const current = dataMap.get(item.frequency);
+      current[item.position] = item.magnitude;
+      // Also store STI for tooltip if needed
+      current[`${item.position}_STI`] = item.sti;
+      current[`${item.position}_STI_Degradation`] = item.stiDegradation;
+      current[`${item.position}_Color`] = item.color;
+    });
+
+    // Sort by frequency
+    return Array.from(dataMap.values()).sort((a, b) => a.frequency - b.frequency);
+  }, [rawFrequencyData]);
+
+  // Get room modes using the comprehensive function
+  const roomModes = useMemo(() => {
+    const { width, depth, height } = STUDIO_8.dimensions;
+    return identifyRoomModes(width, depth, height);
+  }, [STUDIO_8.dimensions]);
 
   // Filter data by frequency range
-  const filteredData = frequencyData.filter(
+  const filteredData = transformedFrequencyData.filter(
     (d) => d.frequency >= freqRange[0] && d.frequency <= freqRange[1]
-  )
+  );
 
-  // Get reference position color
-  const referenceColor = '#10b981' // green
-  const selectedColor = getSTIColor(MEASUREMENT_POSITIONS[selectedPosition]?.degradation || 0)
+  // Get reference position color (Host A)
+  const referenceColor = rawFrequencyData.find(d => d.position === 'Std8-HostA')?.color || '#ff7f0e'; // Default to orange
+  const selectedPositionColor = rawFrequencyData.find(d => d.position === selectedPosition)?.color || '#1f77b4'; // Default to blue
 
   // Export handlers
   const handleExportCSV = () => {
     const csvData = filteredData.map(d => ({
       Frequency: d.frequency,
-      'Reference (Host A)': d['Host A (Reference)'],
+      'Reference (Host A)': d['Std8-HostA'], // Use actual position name
       [selectedPosition]: d[selectedPosition],
     }))
     exportToCSV(csvData, generateFilename('frequency-response', 'csv'))
@@ -58,6 +81,13 @@ export function FrequencyExplorer() {
       }
     }
   }
+
+  // Get unique positions for the selector
+  const uniquePositions = useMemo(() => {
+    const positions = new Set<string>();
+    rawFrequencyData.forEach(item => positions.add(item.position));
+    return Array.from(positions).sort();
+  }, [rawFrequencyData]);
 
   return (
     <div className="space-y-6">
@@ -76,9 +106,9 @@ export function FrequencyExplorer() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.keys(MEASUREMENT_POSITIONS).map((name) => (
+                  {uniquePositions.map((name) => (
                     <SelectItem key={name} value={name}>
-                      {MEASUREMENT_POSITIONS[name].label}
+                      {name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -110,16 +140,16 @@ export function FrequencyExplorer() {
             {/* Modal Analysis Toggle */}
             <div>
               <label className="text-sm font-medium block mb-2">Display Options</label>
-              <button
+              <Button
                 onClick={() => setShowModalAnalysis(!showModalAnalysis)}
-                className={`w-full px-4 py-2 text-sm rounded-md border transition-colors ${
+                className={`w-full px-4 py-2 text-sm transition-colors ${
                   showModalAnalysis
                     ? 'bg-primary text-primary-foreground'
-                    : 'bg-background hover:bg-accent'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                 }`}
               >
                 {showModalAnalysis ? 'Hide' : 'Show'} Room Modes
-              </button>
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -163,7 +193,7 @@ export function FrequencyExplorer() {
                   angle: -90,
                   position: 'insideLeft',
                 }}
-                domain={[60, 110]}
+                domain={[-30, 10]} // Adjusted domain based on CSV data
                 tick={{ fontSize: 12 }}
               />
               <Tooltip
@@ -192,7 +222,7 @@ export function FrequencyExplorer() {
               {/* Reference line (Host A) */}
               <Line
                 type="monotone"
-                dataKey="Host A (Reference)"
+                dataKey="Std8-HostA" // Use actual position name from CSV
                 stroke={referenceColor}
                 strokeWidth={2}
                 dot={false}
@@ -200,14 +230,14 @@ export function FrequencyExplorer() {
               />
 
               {/* Selected position */}
-              {selectedPosition !== 'Host A (Reference)' && (
+              {selectedPosition !== 'Std8-HostA' && ( // Compare with actual position name
                 <Line
                   type="monotone"
                   dataKey={selectedPosition}
-                  stroke={selectedColor}
+                  stroke={selectedPositionColor}
                   strokeWidth={3}
                   dot={false}
-                  name={MEASUREMENT_POSITIONS[selectedPosition]?.label || selectedPosition}
+                  name={selectedPosition}
                 />
               )}
 

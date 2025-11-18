@@ -1,12 +1,29 @@
 import { useMemo } from 'react'
-import { generateDegradationHeatmap } from '../../lib/data/frequencyResponse'
+import { useAcoustics } from '../../context/AcousticsContext'
 import { getSTIColor } from '../../lib/utils/positions'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 
 export function DegradationHeatmap() {
-  const heatmapData = useMemo(() => generateDegradationHeatmap(), [])
+  const { rawFrequencyData } = useAcoustics()
 
-  // Get unique positions and frequencies
+  const heatmapData = useMemo(() => {
+    // Filter rawFrequencyData to get unique position-frequency pairs with STI degradation
+    const uniqueCells = new Map<string, { position: string; frequency: number; degradation: number }>();
+
+    rawFrequencyData.forEach(item => {
+      const key = `${item.position}-${item.frequency}`;
+      // Use STI_Degradation_% from CSV, convert to decimal for getSTIColor
+      uniqueCells.set(key, {
+        position: item.position,
+        frequency: item.frequency,
+        degradation: item.stiDegradation / 100, // Convert percentage to decimal
+      });
+    });
+
+    return Array.from(uniqueCells.values());
+  }, [rawFrequencyData]);
+
+  // Get unique positions and frequencies from the processed heatmapData
   const positions = Array.from(new Set(heatmapData.map((d) => d.position)))
   const frequencies = Array.from(new Set(heatmapData.map((d) => d.frequency))).sort((a, b) => a - b)
 
@@ -60,7 +77,7 @@ export function DegradationHeatmap() {
                     key={i}
                     className="text-xs font-medium -translate-x-full pr-2 text-right"
                   >
-                    {pos.replace(' (Reference)', '').replace(' (Talent)', '')}
+                    {pos.replace('Std8-', '').replace('TheHub-', '')}
                   </div>
                 ))}
               </div>
@@ -84,19 +101,19 @@ export function DegradationHeatmap() {
           {/* Legend */}
           <div className="flex items-center justify-center gap-6 pt-4 border-t">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#10b981' }}></div>
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: getSTIColor(0.1) }}></div>
               <span className="text-xs">Excellent (&lt;15% degradation)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#3b82f6' }}></div>
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: getSTIColor(0.2) }}></div>
               <span className="text-xs">Good (15-25%)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#f59e0b' }}></div>
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: getSTIColor(0.3) }}></div>
               <span className="text-xs">Fair (25-35%)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: '#ef4444' }}></div>
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: getSTIColor(0.4) }}></div>
               <span className="text-xs">Poor (&gt;35%)</span>
             </div>
           </div>

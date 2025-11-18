@@ -4,6 +4,7 @@ import { calculateAverageRT60, classifySTI } from '../lib/acoustics'
 import { ArrowRight, TrendingDown, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '../lib/utils/cn'
+import { STUDIO_8 } from '../lib/utils/constants' // Import STUDIO_8 to get targetRT60
 
 export function Dashboard() {
   const { currentRT60, predictedRT60, currentSTI, predictedSTI, totalPanels, totalCost } =
@@ -15,6 +16,11 @@ export function Dashboard() {
   const stiImprovement = ((predictedSTI - currentSTI) / currentSTI) * 100
 
   const stiQuality = classifySTI(predictedSTI)
+
+  // Calculate RT60 Excess
+  const rt60Excess = avgCurrentRT60 - STUDIO_8.measured.targetRT60;
+  const predictedRt60Excess = avgPredictedRT60 - STUDIO_8.measured.targetRT60;
+
 
   return (
     <PageLayout
@@ -72,6 +78,63 @@ export function Dashboard() {
           <div className="text-2xl font-bold">${totalCost}</div>
           <p className="text-xs text-muted-foreground mt-1">{totalPanels} panels total</p>
         </div>
+      </div>
+
+      {/* Business Impact Metrics */}
+      <div className="grid gap-6 md:grid-cols-2 mb-8">
+        <div className="rounded-lg border bg-card p-6">
+          <h3 className="text-lg font-semibold mb-4">Business Impact: RT60 Excess</h3>
+          <p className="text-muted-foreground mb-2">
+            The difference between current/predicted RT60 and the ITU-R target of{' '}
+            {STUDIO_8.measured.targetRT60}s. Lower is better.
+          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm text-muted-foreground">Current Excess</p>
+              <p className="text-xl font-bold text-red-600">{rt60Excess.toFixed(2)}s</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Predicted Excess</p>
+              <p className="text-xl font-bold text-green-600">{predictedRt60Excess.toFixed(2)}s</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-lg border bg-card p-6">
+          <h3 className="text-lg font-semibold mb-4">Solution Overview</h3>
+          <p className="text-muted-foreground mb-2">
+            Based on the simulated treatment, the total cost is ${totalCost} for {totalPanels}{' '}
+            panels, leading to a significant improvement in acoustic quality.
+          </p>
+          <ul className="list-disc list-inside text-sm text-muted-foreground">
+            <li>Expected STI Improvement: {stiImprovement.toFixed(1)}%</li>
+            <li>Expected RT60 Improvement: {rt60Improvement.toFixed(1)}%</li>
+            <li>Estimated Timeline: 2-4 weeks for procurement and installation</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Implementation Roadmap */}
+      <div className="rounded-lg border bg-card p-6 mb-8">
+        <h3 className="text-lg font-semibold mb-4">Implementation Roadmap</h3>
+        <ol className="list-decimal list-inside text-muted-foreground space-y-2">
+          <li>
+            **Phase 1: Procurement (1 week)** - Order acoustic panels and bass traps based on
+            simulator recommendations.
+          </li>
+          <li>
+            **Phase 2: Installation (1-2 weeks)** - Install corner bass traps, wall panels, and
+            ceiling clouds.
+          </li>
+          <li>
+            **Phase 3: Post-Treatment Measurement (1 day)** - Conduct new Smaart measurements to
+            verify improvements.
+          </li>
+          <li>
+            **Phase 4: Fine-tuning (1-2 days)** - Apply minor EQ adjustments based on new
+            measurements.
+          </li>
+        </ol>
       </div>
 
       {/* Quick Navigation */}

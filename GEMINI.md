@@ -1,6 +1,6 @@
 # CBC Acoustics Dashboard v2 Development Guide
 
-**Workspace:** Inherits conventions from `~/chrislyons/dev/CLAUDE.md`
+**Workspace:** Inherits conventions from `~/chrislyons/dev/GEMINI.md`
 **Documentation PREFIX:** ACU
 **Original Implementation:** https://github.com/chrislyons/cbc-acoustics-dashboard
 **Live Site (v1):** https://cbc-acoustics-dashboard.streamlit.app/
@@ -13,7 +13,7 @@
 Complete rebuild of CBC Studio 8 acoustics visualization dashboard with:
 - **Preserved Backend:** All original measurement data remains authoritative
 - **Modern Frontend:** Current web visualization best practices
-- **Autonomous Execution:** Claude Code self-directed sprint workflows
+- **Autonomous Execution:** Gemini self-directed sprint workflows
 
 ### Original Implementation Reference
 Located at: `/Users/chrislyons/Documents/CL/dev/std8/cbc-interactive-dashboard/`
@@ -29,20 +29,20 @@ Key components to analyze:
 
 ## Configuration Inheritance
 
-1. **This file (CLAUDE.md)** – Repository-specific rules
-2. **Workspace config** (`~/chrislyons/dev/CLAUDE.md`) – Cross-repo patterns
-3. **Global config** (`~/.claude/CLAUDE.md`) – Universal rules
+1. **This file (GEMINI.md)** – Repository-specific rules
+2. **Workspace config** (`~/chrislyons/dev/GEMINI.md`) – Cross-repo patterns
+3. **Global config** (`~/.gemini/GEMINI.md`) – Universal rules
 
 **Conflict Resolution:** Repo > Workspace > Global
 
 ---
 
-## Token Efficiency
+## Efficiency
 
 **BEFORE large refactors:**
-1. Run `/context` to check token usage
-2. Archive docs >63 days old: `bash ~/dev/scripts/archive-old-docs.sh cbc-acoustics-v2 ACU`
-3. Enter Plan Mode (Shift+Tab twice) for analysis tasks
+1. Use targeted `read_file` and `glob` to understand the relevant parts of the codebase.
+2. For broader understanding, use `codebase_investigator`.
+3. Archive docs >63 days old: `bash ~/dev/scripts/archive-old-docs.sh cbc-acoustics-v2 ACU`
 
 **Doc reading priority:** ACU### sprint docs → v1 reference implementation → data schemas
 
@@ -53,7 +53,7 @@ Key components to analyze:
 - `*.log`, `.DS_Store`, `*.swp`
 
 **File boundaries (Read First):**
-- `CLAUDE.md`, `README.md`
+- `GEMINI.md`, `README.md`
 - `docs/acu/` sprint documents (ACU001, ACU002, etc.)
 - v1 reference: `/Users/chrislyons/Documents/CL/dev/std8/cbc-interactive-dashboard/` (on demand)
 
@@ -69,7 +69,7 @@ Key components to analyze:
 
 ### Sprint-Based Workflow
 
-Claude Code should operate in **self-directed sprints** following ACU00X documents:
+Gemini should operate in **self-directed sprints** following ACU00X documents:
 
 1. **ACU001** - Project vision and original implementation analysis
 2. **ACU002** - Sprint 1: Setup and data migration
@@ -80,41 +80,28 @@ Claude Code should operate in **self-directed sprints** following ACU00X documen
 ### Execution Protocol
 
 **Before Starting Work:**
-1. Read relevant ACU00X sprint document completely
-2. Load original implementation files for reference (if needed)
-3. Verify acceptance criteria understanding
-4. Note any blockers or clarifications needed
+1. Read relevant ACU00X sprint document completely.
+2. Use `codebase_investigator` or `read_file` on original implementation files for reference (if needed).
+3. Verify acceptance criteria understanding.
+4. Note any blockers or clarifications needed.
 
 **During Sprint:**
-1. Work autonomously unless blocked
-2. Document decisions in `.claude/scratch/sprint-notes.md`
-3. Create sub-tasks as needed
-4. Run tests continuously
+1. Work autonomously unless blocked.
+2. Use `write_todos` to create and track sub-tasks for complex goals.
+3. Document important decisions or findings in `docs/acu/sprint-notes.md`.
+4. Run tests continuously.
 
 **Sprint Completion:**
-1. Verify all acceptance criteria met
-2. Update sprint status in ACU00X document
-3. Document any deviations or improvements
-4. Signal readiness for next sprint
-
-### Context Management
-
-**Minimize Context Loading:**
-- Only load files actively being modified
-- Use file summaries for reference
-- Leverage `.claude/context/` for distilled knowledge
-
-**Skill Loading Strategy:**
-- `visualization-architect` - Always loaded (core work)
-- `data-validator` - Load when touching data files
-- `test-analyzer` - Load when writing/debugging tests
-- `doc-standards` - Load when creating ACU docs
+1. Verify all acceptance criteria met.
+2. Update sprint status in the relevant ACU00X document.
+3. Document any deviations or improvements.
+4. Signal readiness for the next sprint.
 
 ---
 
 ## Documentation Discovery (On-Demand Only)
 
-**CRITICAL:** PREFIX docs in `docs/acu/` are excluded from auto-indexing to save context. Access them on-demand only.
+**CRITICAL:** PREFIX docs in `docs/acu/` are excluded from auto-indexing. Access them on-demand only.
 
 **Find highest 6 docs:**
 ```bash
@@ -123,7 +110,7 @@ ls -1 docs/acu/ACU*.md | sort -V | tail -6
 
 **Read specific doc (example):**
 ```bash
-# Use Read tool with specific path:
+# Use read_file tool with specific path:
 docs/acu/ACU006 Sprint 3 Completion Report.md
 ```
 
@@ -184,7 +171,7 @@ Technical guidance and constraints.
 
 ```
 cbc-acoustics-v2/
-├── CLAUDE.md                      # This file
+├── GEMINI.md                      # This file
 ├── README.md                      # Project overview
 ├── docs/acu/                      # Sprint & design docs
 │   ├── ACU001 Project Vision.md
@@ -199,11 +186,10 @@ cbc-acoustics-v2/
 │   ├── analysis/                  # Acoustics calculations
 │   └── utils/                     # Helpers
 ├── tests/                         # Test suite
-├── .claude/                       # Claude Code config
-│   ├── skills.json
-│   ├── context/                   # Distilled knowledge
-│   │   └── original-implementation.md
-│   └── scratch/                   # Working notes
+├── .gemini/                       # Gemini config & scratchpad
+│   ├── tmp/                       # Temporary files
+│   └── context/                   # Distilled knowledge
+│       └── original-implementation.md
 └── public/                        # Static assets
 ```
 
@@ -254,14 +240,14 @@ cbc-acoustics-v2/
 
 ## Autonomous Decision Authority
 
-Claude Code has **full authority** to make decisions on:
+Gemini has **full authority** to make decisions on:
 - Framework/library selection (justify in sprint docs)
 - Component architecture and file structure
 - Visual design details (colors, layouts, animations)
 - Testing strategies and tools
 - Build and deployment configuration
 
-Claude Code **must consult** Chris on:
+Gemini **must consult** Chris on:
 - Deviations from preserved backend data
 - Changes to acoustics calculation formulas
 - Blocking technical issues preventing sprint completion
@@ -274,9 +260,8 @@ Claude Code **must consult** Chris on:
 - **Original v1 code:** `/Users/chrislyons/Documents/CL/dev/std8/cbc-interactive-dashboard/`
 - **Live v1 site:** https://cbc-acoustics-dashboard.streamlit.app/
 - **GitHub v1:** https://github.com/chrislyons/cbc-acoustics-dashboard
-- **Workspace config:** `~/chrislyons/dev/CLAUDE.md`
-- **Skill templates:** `~/dev/.claude/skill-templates/`
+- **Workspace config:** `~/chrislyons/dev/GEMINI.md`
 
 ---
 
-**Last Updated:** 2025-11-14
+**Last Updated:** 2025-11-16

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode, useEffect, useMemo } from 'react'
 import type { PanelThickness } from '../lib/acoustics/absorption'
 import { STUDIO_8 } from '../lib/utils/constants'
 import {
@@ -11,6 +11,8 @@ import {
   calculateSTIImprovement,
 } from '../lib/acoustics'
 import { CONVERSIONS } from '../lib/utils/conversions'
+import { parseFrequencyResponseCsv, FrequencyResponseData } from '../lib/data/csvParser';
+import { parseSmaartLog, SmaartData } from '../lib/data/smaartLogParser';
 
 export interface PanelConfig {
   '2_inch': number
@@ -29,6 +31,12 @@ interface AcousticsState {
   // Panel configuration
   panelConfig: PanelConfig
   drapeRemoval: boolean
+
+  // Raw and processed data from CSV
+  rawFrequencyData: FrequencyResponseData[];
+  smaartData: SmaartData | null;
+  isLoading: boolean;
+  error: string | null;
 
   // Calculated metrics (derived from panel config)
   currentRT60: Record<number, number>
@@ -66,6 +74,33 @@ const defaultPanelConfig: PanelConfig = {
   '11_inch': 4,
 }
 
+// Helper function to map selectedPosition to Smaart log file name
+const getSmaartLogFileName = (room: 'Studio 8' | 'The Hub', position: string): string => {
+  if (room === 'Studio 8') {
+    switch (position) {
+      case 'Host A (Reference)': return 'Std8-HostA-128k-Sweep.txt';
+      case 'Host C (Talent)': return 'Std8-HostC-128k-Sweep.txt';
+      case 'Mid Room': return 'Std8-MidRoom-128k-Sweep.txt';
+      case 'Ceiling': return 'Std8-Ceiling-128k-Sweep.txt';
+      case 'NE Corner': return 'Std8-NECorner-High-128k-Sweep.txt'; // Assuming High for now
+      case 'SE Corner': return 'Std8-SECorner-128k-Sweep.txt';
+      case 'SW Corner': return 'Std8-SWCorner-128k-Sweep.txt';
+      default: return 'Std8-HostA-128k-Sweep.txt'; // Fallback
+    }
+  } else if (room === 'The Hub') {
+    switch (position) {
+      case 'Chair 1': return 'TheHub-Chair1-64k.txt';
+      case 'Chair 2': return 'TheHub-Chair2-64k.txt';
+      case 'Mid Room': return 'TheHub-MidRoom-64k.txt';
+      case 'Back Corner': return 'TheHub-BackCorner-64k.txt';
+      case 'Ceiling Corner': return 'TheHub-CeilingCorner-64k.txt';
+      default: return 'TheHub-Chair1-64k.txt'; // Fallback
+    }
+  }
+  return ''; // Should not happen
+};
+
+
 export function AcousticsProvider({ children }: { children: ReactNode }) {
   const [selectedRoom, setSelectedRoom] = useState<'Studio 8' | 'The Hub'>('Studio 8')
   const [selectedPosition, setSelectedPosition] = useState('Host C (Talent)')
@@ -75,10 +110,63 @@ export function AcousticsProvider({ children }: { children: ReactNode }) {
   const [showModalAnalysis, setShowModalAnalysis] = useState(false)
   const [comparisonMode, setComparisonMode] = useState(false)
 
+  const [rawFrequencyData, setRawFrequencyData] = useState<FrequencyResponseData[]>([]);
+  const [smaartData, setSmaartData] = useState<SmaartData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAndParseAllData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Fetch and parse CSV data (Frequency Response)
+        const csvFileName = selectedRoom === 'Studio 8'
+          ? '250728-Studio8-Complete_Frequency_Response.csv'
+          : '250731-TheHub-Complete_Frequency_Response.csv'; // Using the latest for The Hub
+        const csvFilePath = `/data/measurements/${csvFileName}`;
+        const csvResponse = await fetch(csvFilePath);
+        if (!csvResponse.ok) {
+          throw new Error(`HTTP error! status: ${csvResponse.status} for ${csvFilePath}`);
+        }
+        const csvText = await csvResponse.text();
+        const parsedCsvData = parseFrequencyResponseCsv(csvText);
+        setRawFrequencyData(parsedCsvData);
+
+        // Fetch and parse Smaart Log data (RT60, STI)
+        const smaartLogFileName = getSmaartLogFileName(selectedRoom, selectedPosition);
+        const smaartLogFilePath = `/data/250715-smaartLogs/${selectedRoom === 'Studio 8' ? 'Std8' : 'TheHub'}/${smaartLogFileName}`;
+        const smaartLogResponse = await fetch(smaartLogFilePath);
+        if (!smaartLogResponse.ok) {
+          throw new Error(`HTTP error! status: ${smaartLogResponse.status} for ${smaartLogFilePath}`);
+        }
+        const smaartLogText = await smaartLogResponse.text();
+        const parsedSmaartData = parseSmaartLog(smaartLogText);
+        setSmaartData(parsedSmaartData);
+
+      } catch (err) {
+        console.error("Failed to fetch or parse data:", err);
+        setError("Failed to load acoustic data.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAndParseAllData();
+  }, [selectedRoom, selectedPosition]); // Re-run when selectedRoom or selectedPosition changes
+
   // Calculate metrics from current configuration
   const roomData = STUDIO_8 // Could expand to support The Hub later
-  const currentRT60 = roomData.rt60ByFreq
-  const currentSTI = roomData.measured.averageSTI
+
+  // Derive currentSTI from loaded Smaart data
+  const currentSTI = useMemo(() => {
+    return smaartData?.averageSTI || roomData.measured.averageSTI; // Fallback
+  }, [smaartData, roomData.measured.averageSTI]);
+
+  // Derive currentRT60 from loaded Smaart data
+  const currentRT60 = useMemo(() => {
+    return smaartData?.rt60ByFreq || roomData.rt60ByFreq; // Fallback
+  }, [smaartData, roomData.rt60ByFreq]);
 
   // Convert room dimensions to metric for calculations
   const volume = roomData.volume * CONVERSIONS.cubicFeetToMeters
@@ -146,6 +234,10 @@ export function AcousticsProvider({ children }: { children: ReactNode }) {
     selectedPosition,
     panelConfig,
     drapeRemoval,
+    rawFrequencyData,
+    smaartData,
+    isLoading,
+    error,
     currentRT60,
     predictedRT60,
     currentSTI,

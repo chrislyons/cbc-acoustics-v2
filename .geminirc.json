@@ -1,0 +1,22 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "method": "seatbelt",
+    "workspaceRoot": "/Users/chrislyons/dev/cbc-acoustics-v2",
+    "allowedPaths": [
+      "/Users/chrislyons/dev/cbc-acoustics-v2"
+    ],
+    "deniedPaths": [
+      "/Users/chrislyons/dev/*",
+      "/Users/chrislyons/*",
+      "/Users/*",
+      "/*"
+    ]
+  },
+  "restrictions": {
+    "fileSystemAccess": "workspace-only",
+    "shellCommands": "sandbox-only",
+    "networkAccess": "limited"
+  },
+  "approvalMode": "autoEdit"
+}

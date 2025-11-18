@@ -18,13 +18,13 @@ export const STUDIO_8 = {
 
   // Measured baseline (no acoustic treatment)
   measured: {
-    rt60: 0.92, // seconds (average across frequencies)
+    rt60: 0.92, // seconds (average across frequencies) - This value is now dynamically loaded from Smaart logs.
     targetRT60: 0.3, // ITU-R BS.1116 target for broadcast
-    averageSTI: 0.67, // Speech Transmission Index (measured baseline)
+    averageSTI: 0.67, // This value is now dynamically loaded from Smaart logs.
     targetSTI: 0.75, // Target STI for broadcast quality
   },
 
-  // RT60 by frequency band (measured baseline)
+  // RT60 by frequency band (measured baseline) - This data is now dynamically loaded from Smaart logs.
   rt60ByFreq: {
     125: 0.85,
     250: 0.92,
@@ -32,16 +32,6 @@ export const STUDIO_8 = {
     1000: 0.71,
     2000: 0.68,
     4000: 0.55,
-  },
-
-  // STI by position (measured baseline)
-  stiByPosition: {
-    'Host A (Reference)': 0.95,
-    'Host C (Talent)': 0.67,
-    'Mid Room': 0.71,
-    'NE Corner': 0.58,
-    'SE Corner': 0.62,
-    Ceiling: 0.64,
   },
 
   // Reference position (0 degradation baseline)
