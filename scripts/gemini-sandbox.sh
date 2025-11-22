@@ -1,7 +1,7 @@
 #!/bin/bash
-# Gemini CLI Sandbox Wrapper for cbc-acoustics-v2
+# Gemini CLI Sandbox Wrapper for acoustics-dashboard-v2
 #
-# CRITICAL: This script ensures Gemini CLI can ONLY access ~/dev/cbc-acoustics-v2
+# CRITICAL: This script ensures Gemini CLI can ONLY access ~/dev/acoustics-dashboard-v2
 # and cannot see any other directories on the system.
 #
 # Usage:
@@ -10,9 +10,9 @@
 
 set -euo pipefail
 
-# Force change to cbc-acoustics-v2 directory
-PROJECT_DIR="$HOME/dev/cbc-acoustics-v2"
-cd "$PROJECT_DIR" || { echo "❌ Error: Cannot access cbc-acoustics-v2 directory"; exit 1; }
+# Force change to acoustics-dashboard-v2 directory
+PROJECT_DIR="$HOME/dev/acoustics-dashboard-v2"
+cd "$PROJECT_DIR" || { echo "❌ Error: Cannot access acoustics-dashboard-v2 directory"; exit 1; }
 
 # Verify we're in the correct directory (safety check)
 if [[ "$(pwd)" != "$PROJECT_DIR" ]]; then

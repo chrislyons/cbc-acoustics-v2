@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { PanelConfig } from '../../context/AcousticsContext'
 import { STUDIO_8 } from '../../lib/utils/constants'
-import * as THREE from 'three'
+import { DoubleSide } from 'three'
 
 interface PanelPlacement {
   position: [number, number, number]
@@ -127,7 +127,7 @@ function Panel({ placement }: { placement: PanelPlacement }) {
         color={color}
         roughness={0.9}
         metalness={0.1}
-        side={THREE.DoubleSide}
+        side={DoubleSide}
       />
     </mesh>
   )

@@ -13,7 +13,6 @@ import {
 import { useAcoustics } from '../../context/AcousticsContext'
 import { identifyRoomModes } from '../../lib/acoustics/modes' // Using the more comprehensive modal analysis
 import { STUDIO_8 } from '../../lib/utils/constants' // To get room dimensions for modal analysis
-import { getSTIColor } from '../../lib/utils/positions' // This import might need review if MEASUREMENT_POSITIONS is removed
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
@@ -21,7 +20,7 @@ import { Download, FileDown } from 'lucide-react'
 import { exportToCSV, exportChartAsPNG, generateFilename } from '../../lib/utils/export'
 
 export function FrequencyExplorer() {
-  const { selectedPosition, setSelectedPosition, rawFrequencyData, smaartData } = useAcoustics()
+  const { selectedPosition, setSelectedPosition, rawFrequencyData } = useAcoustics()
   const [showModalAnalysis, setShowModalAnalysis] = useState(true)
   const [freqRange, setFreqRange] = useState<[number, number]>([20, 20000])
   const chartRef = useRef<HTMLDivElement>(null)
@@ -31,10 +30,11 @@ export function FrequencyExplorer() {
     const dataMap = new Map<number, Record<string, any>>();
 
     rawFrequencyData.forEach(item => {
-      if (!dataMap.has(item.frequency)) {
-        dataMap.set(item.frequency, { frequency: item.frequency });
+      let current = dataMap.get(item.frequency);
+      if (!current) {
+        current = { frequency: item.frequency };
+        dataMap.set(item.frequency, current);
       }
-      const current = dataMap.get(item.frequency);
       current[item.position] = item.magnitude;
       // Also store STI for tooltip if needed
       current[`${item.position}_STI`] = item.sti;

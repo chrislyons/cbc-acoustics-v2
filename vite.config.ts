@@ -16,6 +16,12 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './tests/setup.ts',
+    exclude: [
+      'node_modules/**',
+      'dist/**',
+      '**/*.config.{js,ts}',
+      'src/components/visualizations/**',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

@@ -1,3 +1,4 @@
+import { BoxGeometry } from 'three'
 import { STUDIO_8 } from '../../lib/utils/constants'
 
 export function RoomGeometry() {
@@ -66,7 +67,7 @@ export function RoomGeometry() {
         <edgesGeometry
           attach="geometry"
           args={[
-            new THREE.BoxGeometry(width, height, depth),
+            new BoxGeometry(width, height, depth),
           ]}
         />
         <lineBasicMaterial attach="material" color="#64748b" linewidth={2} />
@@ -74,6 +75,3 @@ export function RoomGeometry() {
     </group>
   )
 }
-
-// Import THREE for EdgesGeometry
-import * as THREE from 'three'

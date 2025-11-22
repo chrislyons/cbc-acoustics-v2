@@ -29,6 +29,7 @@ export interface RoomMode {
   axis: 'length' | 'width' | 'height' | 'mixed'
   order: [number, number, number] // [nx, ny, nz]
   strength: 'strong' | 'medium' | 'weak'
+  label: string // e.g., "Axial (1,0,0)"
 }
 
 /**
@@ -94,12 +95,15 @@ export function identifyRoomModes(
           axis = 'mixed'
         }
 
+        const label = `${type.charAt(0).toUpperCase() + type.slice(1)} (${nx},${ny},${nz})`
+
         modes.push({
           frequency,
           type,
           axis,
           order: [nx, ny, nz],
           strength,
+          label,
         })
       }
     }

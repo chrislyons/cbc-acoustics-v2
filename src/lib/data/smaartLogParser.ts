@@ -14,17 +14,14 @@ export function parseSmaartLog(logContent: string): SmaartData {
 
   const lines = logContent.split('\n');
   let inRT60Section = false;
-  let inSTISection = false;
   let stiFrequencies: number[] = [];
 
   for (const line of lines) {
     if (line.includes('Filter') && line.includes('Band') && line.includes('RT60')) {
       inRT60Section = true;
-      inSTISection = false;
       continue;
     }
     if (line.trim().startsWith('STI')) {
-      inSTISection = true;
       inRT60Section = false;
       const parts = line.trim().split('\t').filter(s => s.trim() !== '');
       // The STI line itself contains the frequencies and values
@@ -43,7 +40,6 @@ export function parseSmaartLog(logContent: string): SmaartData {
       if (stiValues.length > 0 && !isNaN(stiValues[0])) {
         averageSTI = stiValues[0];
       }
-      inSTISection = false; // Only process the first STI line
       continue;
     }
 

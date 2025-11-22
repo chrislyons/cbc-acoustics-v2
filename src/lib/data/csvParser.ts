@@ -52,6 +52,19 @@ export function parseFrequencyResponseCsv(csvString: string): FrequencyResponseD
           break;
       }
     });
-    return row as FrequencyResponseData;
+    // This is an unsafe type assertion. If the CSV is missing columns,
+    // this can lead to runtime errors.
+    // return row as FrequencyResponseData;
+
+    // A safer approach is to construct the object explicitly.
+    return {
+      position: String(row.position ?? 'Unknown'),
+      frequency: Number(row.frequency ?? 0),
+      magnitude: Number(row.magnitude ?? 0),
+      color: String(row.color ?? '#000000'),
+      phase: Number(row.phase ?? 0),
+      sti: Number(row.sti ?? 0),
+      stiDegradation: Number(row.stiDegradation ?? 0),
+    };
   });
 }

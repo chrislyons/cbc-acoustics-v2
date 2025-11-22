@@ -39,19 +39,19 @@ git clone [your-repo-url] ~/dev/cbc-acoustics-v2
 cd ~/dev/cbc-acoustics-v2
 
 # Install dependencies
-npm install  # or: pip install -r requirements.txt
+npm install
 
 # Run development server
-npm run dev  # or: python src/main.py
+npm run dev
 ```
 
 ---
 
-## For Claude Code: Autonomous Rebuild
+## For Gemini: Autonomous Rebuild
 
-This project is designed for **self-directed Claude Code operation**:
+This project is designed for **self-directed Gemini operation**:
 
-1. **Read:** [`CLAUDE.md`](./CLAUDE.md) for development guidelines
+1. **Read:** [`GEMINI.md`](./GEMINI.md) for development guidelines
 2. **Start:** [`docs/acu/ACU001 Project Vision.md`](./docs/acu/ACU001%20Project%20Vision.md)
 3. **Execute:** Sprint documents ACU002 → ACU005 sequentially
 4. **Reference:** Original implementation at `/Users/chrislyons/Documents/CL/dev/std8/cbc-interactive-dashboard/`
@@ -85,7 +85,7 @@ cbc-acoustics-v2/
 │   ├── visualizations/ # Charts and 3D models
 │   └── analysis/       # Acoustics calculations
 ├── tests/              # Test suite
-└── .claude/            # Claude Code configuration
+└── .gemini/            # Gemini configuration
     └── context/        # Original implementation analysis
 ```
 
@@ -93,7 +93,7 @@ cbc-acoustics-v2/
 
 ## Development
 
-See [`CLAUDE.md`](./CLAUDE.md) for comprehensive development conventions and autonomous operation guidelines.
+See [`GEMINI.md`](./GEMINI.md) for comprehensive development conventions and autonomous operation guidelines.
 
 ---
 
@@ -104,5 +104,5 @@ v2 rebuild preserves original data and acoustics models with modernized presenta
 
 ---
 
-**Status:** 🚧 In Development (Sprint-based rebuild via Claude Code)  
+**Status:** ✅ Development Environment Setup Complete  
 **Next Sprint:** See `docs/acu/ACU002 Sprint 1 Setup.md`

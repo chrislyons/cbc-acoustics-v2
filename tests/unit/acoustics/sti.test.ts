@@ -105,7 +105,7 @@ describe('STI Calculations', () => {
       const generalSTI = calculatePositionSTI(currentSTI, baseImprovement, 'general')
       const talentSTI = calculatePositionSTI(currentSTI, baseImprovement, 'talent')
 
-      expect(talentSTI).toBeGreaterThan(generalSTI)
+      expect( talentSTI).toBeGreaterThan(generalSTI)
     })
 
     it('should not exceed maximum STI of 0.95', () => {

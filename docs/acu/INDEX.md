@@ -19,7 +19,7 @@
 
 ## Sprint Sequence
 
-**For Claude Code autonomous execution:**
+**For Gemini autonomous execution:**
 
 1. **ACU002** - Setup repo, migrate data, validate calculations
 2. **ACU003** - Choose framework, design architecture, scaffold app
@@ -44,10 +44,8 @@ Each sprint includes:
 
 ## Archive
 
-Documents older than 180 days move to [`archive/`](./archive/).
-
-Use `~/dev/scripts/archive-old-docs.sh` to trigger.
+Documents older than 63 days move to [`archive/`](./archive/).
 
 ---
 
-**Last Updated:** $(date +%Y-%m-%d)
+**Last Updated:** 2025-11-22
